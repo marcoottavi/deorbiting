@@ -28,23 +28,24 @@ from constants import EARTH_CONSTANTS, CONVERSIONS
 # ============================================================================
 # SIMULATION PARAMETERS - EDIT THESE VALUES TO CONFIGURE YOUR SIMULATION
 # ============================================================================
+os.system('clear')
 
 # 📍 INITIAL ORBITAL ELEMENTS
 altitude = 400.0          # km above Earth's surface
 eccentricity = 0.001      # orbital eccentricity (0 = circular, <1 = elliptical)
 inclination = 51.6        # degrees (0 = equatorial, 90 = polar)
-raan = 0.0               # degrees (Right Ascension of Ascending Node)
-arg_perigee = 0.0        # degrees (Argument of Perigee)
-true_anomaly = 0.0       # degrees (True Anomaly)
+raan = 45.0               # degrees (Right Ascension of Ascending Node)
+arg_perigee = 45.0        # degrees (Argument of Perigee)
+true_anomaly = 0.0        # degrees (True Anomaly)
 
 # ⏱️ SIMULATION PARAMETERS
-duration_days = 1.0      # simulation duration in days
+duration_days = 3      # simulation duration in days
 time_step_minutes = 5.0  # integration time step in minutes
 
 # 🌍 PERTURBATIONS (True/False)
 include_j2 = True        # include J2 gravitational perturbations
-include_drag = False     # include atmospheric drag
-include_thrust = False   # include constant thrust
+include_drag = True     # include atmospheric drag
+include_thrust = True   # include constant thrust
 
 # 🚀 SPACECRAFT PARAMETERS
 spacecraft_mass = 500.0         # kg
@@ -52,15 +53,15 @@ ballistic_coefficient = 100.0   # kg/m² (mass/drag_area)
 solar_flux = 150.0              # F10.7 solar flux index
 
 # 🔥 THRUST PARAMETERS (only used if include_thrust = True)
-thrust_magnitude = 0.5          # N (Newtons)
-specific_impulse = 3000.0       # s (seconds)
-thrust_direction = "prograde"   # "prograde" or "retrograde"
+thrust_magnitude = 0.01          # N (Newtons)
+specific_impulse = 5000.0       # s (seconds)
+thrust_direction = "retrograde"   # "prograde" or "retrograde"
 
 # 📊 OUTPUT OPTIONS
 generate_3d_plot = True         # generate interactive 3D plot with Plotly
 
 # 🎯 EVENT DETECTION (only used if include_thrust = True)
-enable_altitude_event = False   # stop simulation when altitude threshold reached
+enable_altitude_event = True   # stop simulation when altitude threshold reached
 altitude_threshold = 100.0      # km
 
 # ============================================================================
@@ -161,8 +162,8 @@ def run_simulation(params):
     
     try:
         if params['include_thrust']:
-            # Get thrust direction
-            thrust_dir = None  # Will be set automatically based on string
+            # Pass thrust direction string directly to propagator
+            thrust_dir = params['thrust_direction']
             
             # Run simulation with mass variation
             results = propagator.propagate_with_mass(

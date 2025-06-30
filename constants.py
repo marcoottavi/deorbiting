@@ -19,7 +19,7 @@ EARTH_CONSTANTS = {
     'mu': 3.986004418e14,           # Earth gravitational parameter [m³/s²]
     'rotation_rate': 7.2921159e-5,  # Earth rotation rate [rad/s]
     'mass': 5.972168e24,            # Earth mass [kg]
-    'j2': 1.08262668e-3,            # Second zonal harmonic coefficient
+    'j2': - 1.08262668e-3,            # Second zonal harmonic coefficient
 }
 
 # ============================================================================

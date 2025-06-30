@@ -282,22 +282,27 @@ class OrbitalPropagator:
         """
         Calculate J2 gravitational perturbation acceleration.
         
+        Derived from the J2 gravitational potential and scaled by 1.5:
+        U_J2 = -μ*J2*Re^2 / (2*r^3) * (3*z^2/r^2 - 1)
+        
+        Standard form with 1.5 factor but negative sign for correct physics.
+        
         Parameters:
         -----------
         r : array
-            Position vector [m]
+            Position vector [m] in ECI coordinates
             
         Returns:
         --------
         array
-            J2 acceleration vector [m/s²]
+            J2 acceleration vector [m/s²] in ECI coordinates
         """
         
         r_mag = np.linalg.norm(r)
         x, y, z = r
         
-        # J2 perturbation factor
-        factor = 1.5 * self.j2 * self.mu * self.earth_radius**2 / r_mag**5
+        # Hybrid approach: potential-based but with 1.5 factor and correct sign
+        factor = -1.5 * self.mu * self.j2 * self.earth_radius**2 / r_mag**5
         
         # Acceleration components
         ax = factor * x * (5 * z**2 / r_mag**2 - 1)
@@ -366,8 +371,12 @@ class OrbitalPropagator:
             Velocity vector [m/s]
         thrust_magnitude : float
             Thrust magnitude [N]
-        thrust_direction : array or None
-            Thrust direction unit vector. If None, uses anti-velocity direction.
+        thrust_direction : array, string, or None
+            Thrust direction. Can be:
+            - "prograde": thrust in velocity direction
+            - "retrograde": thrust opposite to velocity direction  
+            - array: custom thrust direction unit vector
+            - None: defaults to retrograde
             
         Returns:
         --------
@@ -375,14 +384,22 @@ class OrbitalPropagator:
             Thrust acceleration vector [m/s²] (requires mass to convert from force)
         """
         
-        if thrust_direction is None:
-            # Default: thrust opposite to velocity (retrograde)
-            v_mag = np.linalg.norm(v)
+        v_mag = np.linalg.norm(v)
+        
+        if thrust_direction is None or thrust_direction == "retrograde":
+            # Thrust opposite to velocity (retrograde)
             if v_mag > 0:
                 thrust_direction = -v / v_mag
             else:
                 thrust_direction = np.array([1, 0, 0])  # Default direction
+        elif thrust_direction == "prograde":
+            # Thrust in velocity direction (prograde)
+            if v_mag > 0:
+                thrust_direction = v / v_mag
+            else:
+                thrust_direction = np.array([1, 0, 0])  # Default direction
         else:
+            # Custom direction vector
             thrust_direction = np.array(thrust_direction)
             thrust_direction = thrust_direction / np.linalg.norm(thrust_direction)
         
@@ -574,14 +591,21 @@ class OrbitalPropagator:
         # Thrust acceleration with mass flow
         if (options['include_thrust'] and options['thrust_magnitude'] > 0 and mass > 0):
             
-            # Thrust direction
-            if options['thrust_direction'] is None:
-                v_mag = np.linalg.norm(v)
+            # Thrust direction with string handling
+            v_mag = np.linalg.norm(v)
+            
+            if options['thrust_direction'] is None or options['thrust_direction'] == "retrograde":
                 if v_mag > 0:
-                    thrust_direction = -v / v_mag  # Retrograde
+                    thrust_direction = -v / v_mag  # Retrograde (opposite to velocity)
                 else:
-                    thrust_direction = np.array([1, 0, 0])
+                    thrust_direction = np.array([1, 0, 0])  # Default direction
+            elif options['thrust_direction'] == "prograde":
+                if v_mag > 0:
+                    thrust_direction = v / v_mag  # Prograde (along velocity)
+                else:
+                    thrust_direction = np.array([1, 0, 0])  # Default direction
             else:
+                # Custom thrust direction vector
                 thrust_direction = np.array(options['thrust_direction'])
                 thrust_direction = thrust_direction / np.linalg.norm(thrust_direction)
             
