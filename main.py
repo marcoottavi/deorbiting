@@ -33,13 +33,13 @@ os.system('clear')
 # 📍 INITIAL ORBITAL ELEMENTS
 altitude = 400.0          # km above Earth's surface
 eccentricity = 0.001      # orbital eccentricity (0 = circular, <1 = elliptical)
-inclination = 51.6        # degrees (0 = equatorial, 90 = polar)
+inclination = 0        # degrees (0 = equatorial, 90 = polar)
 raan = 45.0               # degrees (Right Ascension of Ascending Node)
 arg_perigee = 45.0        # degrees (Argument of Perigee)
 true_anomaly = 0.0        # degrees (True Anomaly)
 
 # ⏱️ SIMULATION PARAMETERS
-duration_days = 3      # simulation duration in days
+duration_days = 10      # simulation duration in days
 time_step_minutes = 5.0  # integration time step in minutes
 
 # 🌍 PERTURBATIONS (True/False)
@@ -53,9 +53,9 @@ ballistic_coefficient = 100.0   # kg/m² (mass/drag_area)
 solar_flux = 150.0              # F10.7 solar flux index
 
 # 🔥 THRUST PARAMETERS (only used if include_thrust = True)
-thrust_magnitude = 0.01          # N (Newtons)
-specific_impulse = 5000.0       # s (seconds)
-thrust_direction = "retrograde"   # "prograde" or "retrograde"
+thrust_magnitude = 0.1          # N (Newtons)
+specific_impulse = 500.0       # s (seconds)
+thrust_direction = "prograde"   # "prograde" or "retrograde"
 
 # 📊 OUTPUT OPTIONS
 generate_3d_plot = True         # generate interactive 3D plot with Plotly
